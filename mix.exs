@@ -73,6 +73,7 @@ defmodule VsmStarter.MixProject do
   defp package() do
     [
       name: "vsm_starter",
+      organization: "viable_systems",
       licenses: ["MIT"],
       links: %{
         "GitHub" => @source_url,

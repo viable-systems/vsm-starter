@@ -1,9 +1,8 @@
 # VSM Starter
 
-[![Hex.pm](https://img.shields.io/hexpm/v/vsm_starter.svg)](https://hex.pm/packages/vsm_starter)
 [![Build Status](https://github.com/viable-systems/vsm-starter/workflows/CI/badge.svg)](https://github.com/viable-systems/vsm-starter/actions)
-[![Coverage Status](https://coveralls.io/repos/github/viable-systems/vsm-starter/badge.svg?branch=main)](https://coveralls.io/github/viable-systems/vsm-starter?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Elixir Version](https://img.shields.io/badge/elixir-~%3E%201.15-purple)
 
 A starter template for building Viable Systems Model (VSM) applications in Elixir. This template provides a foundation for implementing cybernetic systems based on Stafford Beer's VSM framework.
 
@@ -204,62 +203,51 @@ The VSM Starter emits the following telemetry events:
 
 ```elixir
 defmodule MyOrganization.VSM do
-  use VsmStarter.Framework
+  use VsmStarter
 
-  # Define your System 1 operations
-  operations do
-    operation :sales, MyOrganization.Sales
-    operation :production, MyOrganization.Production
-    operation :delivery, MyOrganization.Delivery
-  end
-
-  # Define coordination rules
-  coordination do
-    rule :resource_conflict, &coordinate_resources/2
-    rule :schedule_overlap, &resolve_scheduling/2
-  end
-
-  # Define control mechanisms
-  control do
-    monitor :performance, interval: :timer.seconds(30)
-    audit :compliance, probability: 0.1
-  end
-
-  # Define intelligence gathering
-  intelligence do
-    scan :market_trends, MyOrganization.MarketAnalysis
-    scan :competitor_activity, MyOrganization.CompetitorWatch
-  end
-
-  # Define organizational policy
-  policy do
-    identity "Sustainable Manufacturing Corp"
-    purpose "Create value through sustainable practices"
-    values [:sustainability, :quality, :innovation]
+  def start_link(opts) do
+    VsmStarter.start_link(__MODULE__, opts)
   end
 end
+
+# Start the VSM
+{:ok, vsm} = MyOrganization.VSM.start_link(
+  name: MyOrganization.VSM,
+  system_config: %{
+    system1: %{operations: [:sales, :production, :delivery]},
+    system2: %{coordination_interval: 5_000},
+    system3: %{audit_probability: 0.1},
+    system4: %{scan_interval: 30_000},
+    system5: %{policy_review_interval: 86_400_000}
+  }
+)
+
+# Use the VSM
+VsmStarter.health_check(MyOrganization.VSM)
+VsmStarter.variety_metrics(MyOrganization.VSM)
 ```
 
 ### Handling Algedonic Signals
 
 ```elixir
-defmodule MyOrganization.AlgedonicHandler do
-  use VsmStarter.Algedonic
+# Send algedonic signals through the VSM
+VsmStarter.algedonic_signal(MyOrganization.VSM, :warning, %{
+  source: :production,
+  message: "Resource shortage detected",
+  impact: :medium
+})
 
-  @impl true
-  def handle_alert(:critical, alert, state) do
-    # Immediately escalate to System 5
-    System5.emergency_response(alert)
-    {:escalate, :system5, state}
-  end
+VsmStarter.algedonic_signal(MyOrganization.VSM, :critical, %{
+  source: :quality_control, 
+  message: "Critical quality issue",
+  impact: :high
+})
 
-  @impl true
-  def handle_alert(:warning, alert, state) do
-    # Route to System 3 for handling
-    System3.handle_warning(alert)
-    {:handled, state}
-  end
-end
+VsmStarter.algedonic_signal(MyOrganization.VSM, :emergency, %{
+  source: :safety,
+  message: "Safety protocol breach",
+  impact: :severe
+})
 ```
 
 ## Configuration
@@ -284,27 +272,32 @@ config :telemetry_poller, :default,
 
 ## Testing
 
-VSM Starter includes testing utilities:
+VSM Starter components can be tested using standard ExUnit:
 
 ```elixir
 defmodule MyOrganization.VSMTest do
   use ExUnit.Case
-  use VsmStarter.Testing
 
-  test "system responds to environmental changes" do
-    vsm = start_vsm!(MyOrganization.VSM)
+  test "VSM health check returns operational status" do
+    {:ok, _vsm} = MyOrganization.VSM.start_link(name: TestVSM)
     
-    # Simulate environmental change
-    inject_environment_signal(vsm, :market_shift, %{
-      direction: :downturn,
-      severity: :moderate
+    {:ok, health} = VsmStarter.health_check(TestVSM)
+    
+    assert health.overall == :healthy
+    assert health.system1 == :operational
+    assert health.system2 == :operational
+    assert health.system3 == :operational
+    assert health.system4 == :operational
+    assert health.system5 == :operational
+  end
+
+  test "algedonic signals are handled correctly" do
+    {:ok, _vsm} = MyOrganization.VSM.start_link(name: TestVSM)
+    
+    assert :ok = VsmStarter.algedonic_signal(TestVSM, :warning, %{
+      source: :test,
+      message: "Test warning"
     })
-    
-    # Assert System 4 responds
-    assert_system_event(vsm, :system4, :model_updated, timeout: 1000)
-    
-    # Assert System 3 reallocates resources
-    assert_system_event(vsm, :system3, :resources_reallocated)
   end
 end
 ```
@@ -329,12 +322,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Resources
 
-- [VSM Guide](https://viable-systems.github.io/guide)
+- [Stafford Beer's VSM Overview](https://en.wikipedia.org/wiki/Viable_system_model)
 - [Cybernetics and Management](https://www.kybernetik.ch/en/fs_methoden.html)
 - [Telemetry Documentation](https://hexdocs.pm/telemetry)
+- [Elixir Documentation](https://elixir-lang.org/docs.html)
 
 ## Support
 
-- Documentation: [https://hexdocs.pm/vsm_starter](https://hexdocs.pm/vsm_starter)
+- Source Code: [GitHub Repository](https://github.com/viable-systems/vsm-starter)
 - Issues: [GitHub Issues](https://github.com/viable-systems/vsm-starter/issues)
-- Discussions: [GitHub Discussions](https://github.com/viable-systems/vsm-starter/discussions)
+- Documentation: Coming soon on Hex.pm after package publication

@@ -8,7 +8,7 @@ defmodule VsmStarter.MixProject do
     [
       app: :vsm_starter,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -49,7 +49,7 @@ defmodule VsmStarter.MixProject do
       # Core dependencies
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},
-      {:telemetry_poller, "~> 1.0"},
+      {:telemetry_poller, "~> 1.1"},
 
       # Optional dependencies for common VSM patterns
       {:jason, "~> 1.4"},
